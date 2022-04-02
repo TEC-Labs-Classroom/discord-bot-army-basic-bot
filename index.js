@@ -1,6 +1,25 @@
 // import needed discord classes
 const { Client, Intents, MessageEmbed } = require("discord.js");
-const { token } = require("./config.json");
+const { clientID, guildID, token } = require("./config.json");
+
+const { SlashCommandBuilder } = require("@discordjs/builders");
+const { REST } = require("@discordjs/rest");
+const { Routes } = require("discord-api-types/v9");
+const { infoHandler } = require("./handlers/infoHandler.js");
+
+const fs = require("node:fs");
+
+/*
+scope type variable_name = value;
+C -->
+int x = 5;
+C++ ->
+const int x = 5;
+Js ->
+var x = 5;
+let x = 5;
+const x = 5;
+*/
 
 // discord bot connection instance
 const client = new Client({
@@ -9,6 +28,29 @@ const client = new Client({
 
 client.on("ready", () => {
 	console.log("Hello world! (in terminal)");
+});
+
+// Slash Commands
+
+const command = [
+	new SlashCommandBuilder().setName("hello").setDescription("Say hello to the bot"),
+	new SlashCommandBuilder().setName("info").setDescription("Sends your username back to you."),
+].map((cmd) => cmd.toJSON());
+
+const rest = new REST({ version: "9" }).setToken(token);
+
+rest.put(Routes.applicationGuildCommands(clientID, guildID), { body: command });
+
+client.on("interactionCreate", async (interaction) => {
+	if (!interaction.isCommand()) return;
+	if (interaction.commandName === "hello") {
+		await interaction.reply("Hello World");
+		return;
+	}
+	if (interaction.commandName === "info") {
+		await infoHandler(interaction);
+		return;
+	}
 });
 
 /*
