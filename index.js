@@ -1,12 +1,13 @@
 // import needed discord classes
-const { Client, Intents, MessageEmbed } = require("discord.js");
+const { Client, Intents, MessageEmbed, Integration } = require("discord.js");
 const { clientID, guildID, token } = require("./config.json");
 
+const { infoHandler } = require("./handlers/infoHandler.js");
+
+// Slash Commands
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
-const { infoHandler } = require("./handlers/infoHandler.js");
-
 const fs = require("node:fs");
 
 /*
@@ -35,6 +36,15 @@ client.on("ready", () => {
 const command = [
 	new SlashCommandBuilder().setName("hello").setDescription("Say hello to the bot"),
 	new SlashCommandBuilder().setName("info").setDescription("Sends your username back to you."),
+	new SlashCommandBuilder()
+		.setName("add")
+		.setDescription("Add two numbers")
+		.addIntegerOption((option) =>
+			option.setName("num1").setDescription("the first number").setRequired(true)
+		)
+		.addIntegerOption((option) =>
+			option.setName("num2").setDescription("the second number").setRequired(true).setMinValue(1)
+		),
 ].map((cmd) => cmd.toJSON());
 
 const rest = new REST({ version: "9" }).setToken(token);
@@ -50,6 +60,11 @@ client.on("interactionCreate", async (interaction) => {
 	if (interaction.commandName === "info") {
 		await infoHandler(interaction);
 		return;
+	}
+	if (interaction.commandName === "add") {
+		const num1 = interaction.options.getInteger("num1");
+		const num2 = interaction.options.getInteger("num2");
+		await interaction.reply(`Sum: ${num1 + num2}`);
 	}
 });
 

@@ -1,3 +1,5 @@
 {
 	"token": "YOUR_TOKEN_HERE"
+    "clientID": "YOUR_BOT'S CLIENT ID",
+    "guildID": "Your testring server's ID"
 }
