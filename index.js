@@ -45,6 +45,15 @@ const command = [
 		.addIntegerOption((option) =>
 			option.setName("num2").setDescription("the second number").setRequired(true).setMinValue(1)
 		),
+	new SlashCommandBuilder()
+		.setName("praise")
+		.setDescription("Praise the users")
+		.addUserOption((option) =>
+			option.setName("user").setDescription("The user to praise").setRequired(true)
+		)
+		.addStringOption((option) =>
+			option.setName("reason").setDescription("Reason for praise").setRequired(true)
+		),
 ].map((cmd) => cmd.toJSON());
 
 const rest = new REST({ version: "9" }).setToken(token);
@@ -64,7 +73,15 @@ client.on("interactionCreate", async (interaction) => {
 	if (interaction.commandName === "add") {
 		const num1 = interaction.options.getInteger("num1");
 		const num2 = interaction.options.getInteger("num2");
-		await interaction.reply(`Sum: ${num1 + num2}`);
+		// await interaction.deferReply();
+		await interaction.reply({ content: `Sum: ${num1 + num2}`, ephemeral: true });
+		// await interaction.followUp(`Diff: ${num1 - num2}`);
+		// await interaction.editReply(`Diff: ${num1 - num2}`);
+	}
+	if (interaction.commandName === "praise") {
+		const user = interaction.options.getUser("user");
+		const reason = interaction.options.getString("reason");
+		await interaction.reply(`<@!${user.id}> was praised for ${reason}`);
 	}
 });
 
